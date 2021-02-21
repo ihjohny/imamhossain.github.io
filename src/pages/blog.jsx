@@ -1,25 +1,23 @@
 import { graphql } from 'gatsby';
+import get from 'lodash/get';
 import React from 'react';
 
 import BlogPosts from '../components/blog-posts';
 import Header from '../components/header';
 import Layout from '../components/layout';
 import SEO from '../components/seo';
-import NotFound from '../pages/404';
 
 const Index = ({ data }) => {
   const posts = data.allMarkdownRemark.edges;
-  const noBlog = !posts || !posts.length;
+  const blogEnabled = get(data, 'site.siteMetadata.blogEnabled', false);
 
-  if (!posts || !posts.length) {
-    return <NotFound />;
-  }
+  if (!blogEnabled) return null;
 
   return (
     <Layout>
       <SEO title="Blog" />
       <Header metadata={data.site.siteMetadata} />
-      {!noBlog && <BlogPosts posts={posts} />}
+      {posts && posts.length && <BlogPosts posts={posts} />}
     </Layout>
   );
 };
@@ -30,6 +28,7 @@ export const pageQuery = graphql`
   query {
     site {
       siteMetadata {
+        blogEnabled
         name
         title
         description
